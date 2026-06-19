@@ -47,7 +47,14 @@ class AgentEvent:
     timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 
-DEFAULT_SYSTEM_PROMPT = """You are an autonomous agent with access to tools.
+def _build_default_system_prompt(tools: list[dict]) -> str:
+    tool_lines = "\n".join(
+        f"- **{t['name']}**: {t['description']}" for t in tools
+    )
+    return f"""You are an autonomous agent running inside an LLM Orchestration Platform.
+
+You have access to the following tools:
+{tool_lines}
 
 Approach each goal methodically:
 1. Think through what you need to accomplish step by step
@@ -82,19 +89,19 @@ async def run_agent(
     adapter = get_adapter(model)
     ctx = ContextManager()
 
-    # Build system prompt, optionally injecting episodic memory
-    sys_prompt = system_prompt or DEFAULT_SYSTEM_PROMPT
-    if use_episodic_memory:
-        episode_context = format_episode_context(goal)
-        if episode_context:
-            sys_prompt = f"{sys_prompt}\n\n{episode_context}"
-
     # Get available tools
     from backend.tools.registry import get_tool_schemas_for, get_tool_schemas
     if tool_names is not None:
         tools = get_tool_schemas_for(tool_names)
     else:
         tools = get_tool_schemas()
+
+    # Build system prompt now that we know the tool list
+    sys_prompt = system_prompt or _build_default_system_prompt(tools)
+    if use_episodic_memory:
+        episode_context = format_episode_context(goal)
+        if episode_context:
+            sys_prompt = f"{sys_prompt}\n\n{episode_context}"
 
     # Seed context with the goal
     ctx.add(Message(role="user", content=goal))

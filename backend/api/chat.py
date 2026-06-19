@@ -13,6 +13,21 @@ from backend.adapters import get_adapter, Message
 from backend.db.database import get_session
 from backend.db.models import Conversation, Turn
 from backend.config import settings
+from backend.tools.registry import get_all_tools
+
+def _chat_system_prompt() -> str:
+    tool_lines = "\n".join(
+        f"- **{t.name}**: {t.description}" for t in get_all_tools()
+    )
+    return f"""You are a helpful AI assistant running inside an LLM Orchestration Platform.
+
+You can answer questions about any topic. When asked about your tools or capabilities,
+describe the following tools that are available in this platform's agent mode:
+
+{tool_lines}
+
+In chat mode you respond directly without calling tools. Switch to Agent mode (⚡) in the UI
+to have the agent autonomously plan and execute tasks using these tools."""
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -73,7 +88,7 @@ async def chat_stream(
         try:
             async for event in adapter.stream(
                 messages=messages,
-                system=req.system_prompt,
+                system=req.system_prompt or _chat_system_prompt(),
                 max_tokens=req.max_tokens,
                 temperature=req.temperature,
             ):
@@ -125,7 +140,7 @@ async def chat(
 
     result = await adapter.complete(
         messages=messages,
-        system=req.system_prompt,
+        system=req.system_prompt or _chat_system_prompt(),
         max_tokens=req.max_tokens,
         temperature=req.temperature,
     )
