@@ -94,9 +94,9 @@ const selectorBtn: React.CSSProperties = {
 }
 
 const dropdownStyle: React.CSSProperties = {
-  position: 'absolute', bottom: '100%', left: 0, marginBottom: 6,
+  position: 'absolute', top: '100%', right: 0, marginTop: 6,
   background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8,
-  minWidth: 240, maxHeight: 380, overflowY: 'auto', zIndex: 10,
+  minWidth: 240, maxHeight: 420, overflowY: 'auto', zIndex: 100,
   boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
 }
 
