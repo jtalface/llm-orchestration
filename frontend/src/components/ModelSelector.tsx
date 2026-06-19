@@ -6,9 +6,11 @@ interface Props {
   onChange: (model: string) => void
   isAgent: boolean
   onToggleAgent: (v: boolean) => void
+  isMultiAgent: boolean
+  onToggleMultiAgent: (v: boolean) => void
 }
 
-export default function ModelSelector({ value, onChange, isAgent, onToggleAgent }: Props) {
+export default function ModelSelector({ value, onChange, isAgent, onToggleAgent, isMultiAgent, onToggleMultiAgent }: Props) {
   const [open, setOpen] = useState(false)
 
   const allModels = Object.entries(MODELS).flatMap(([provider, models]) =>
@@ -79,6 +81,22 @@ export default function ModelSelector({ value, onChange, isAgent, onToggleAgent 
       >
         {isAgent ? '⚡ Agent' : '💬 Chat'}
       </button>
+
+      {/* Multi-agent toggle — only relevant in agent mode */}
+      {isAgent && (
+        <button
+          onClick={() => onToggleMultiAgent(!isMultiAgent)}
+          style={{
+            ...agentToggleStyle,
+            background: isMultiAgent ? '#7c3aed' : 'var(--surface2)',
+            color: isMultiAgent ? '#fff' : 'var(--text-dim)',
+            border: isMultiAgent ? 'none' : '1px solid var(--border)',
+          }}
+          title="Multi-agent: manager decomposes goal → specialists run in parallel → synthesis"
+        >
+          {isMultiAgent ? '🤖 Multi' : '🤖 Single'}
+        </button>
+      )}
 
       {open && (
         <div onClick={() => setOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 9 }} />

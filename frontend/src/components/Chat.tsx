@@ -17,6 +17,7 @@ export default function Chat({ conversation, onFirstMessage }: Props) {
   const [sending, setSending] = useState(false)
   const [model, setModel] = useState('claude-sonnet-4-6')
   const [isAgentMode, setIsAgentMode] = useState(false)
+  const [isMultiAgent, setIsMultiAgent] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -129,7 +130,7 @@ export default function Chat({ conversation, onFirstMessage }: Props) {
   }
 
   const streamAgent = async (text: string, assistantId: string) => {
-    const body: Record<string, unknown> = { goal: text, model }
+    const body: Record<string, unknown> = { goal: text, model, multi_agent: isMultiAgent }
     if (conversation) body.conversation_id = conversation.id
 
     const res = await fetch('/agents/run/stream', {
@@ -208,7 +209,13 @@ export default function Chat({ conversation, onFirstMessage }: Props) {
         <span style={{ fontWeight: 600, fontSize: 15, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {conversation.title}
         </span>
-        <ModelSelector value={model} onChange={setModel} isAgent={isAgentMode} onToggleAgent={setIsAgentMode} />
+        <ModelSelector
+          value={model} onChange={setModel}
+          isAgent={isAgentMode}
+          onToggleAgent={v => { setIsAgentMode(v); if (!v) setIsMultiAgent(false) }}
+          isMultiAgent={isMultiAgent}
+          onToggleMultiAgent={setIsMultiAgent}
+        />
       </div>
 
       {/* Messages */}
