@@ -1,0 +1,93 @@
+<svg viewBox="0 0 780 420" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, -apple-system, sans-serif">
+  <title>Tool Registry and SSE Event Stream</title>
+
+  <defs>
+    <marker id="a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#888"/>
+    </marker>
+  </defs>
+
+  <rect width="780" height="420" fill="#0d1117" rx="12"/>
+  <text x="390" y="30" text-anchor="middle" fill="#e6edf3" font-size="15" font-weight="700">Tool Registry + SSE Event Stream</text>
+
+  <!-- Tool Registry -->
+  <rect x="30" y="50" width="330" height="350" rx="10" fill="#111827" stroke="#374151" stroke-width="1.5"/>
+  <text x="195" y="72" text-anchor="middle" fill="#fb923c" font-size="13" font-weight="700">Tool Registry</text>
+  <text x="195" y="88" text-anchor="middle" fill="#8b949e" font-size="10">tools/registry.py</text>
+
+  <rect x="48" y="98" width="294" height="52" rx="6" fill="#1f2937" stroke="#f97316" stroke-width="1"/>
+  <text x="195" y="116" text-anchor="middle" fill="#fb923c" font-size="11" font-weight="600">@tool decorator</text>
+  <text x="195" y="131" text-anchor="middle" fill="#8b949e" font-size="10">inspects fn signature → builds JSON schema</text>
+  <text x="195" y="144" text-anchor="middle" fill="#8b949e" font-size="10">registers ToolDefinition in _REGISTRY dict</text>
+
+  <text x="195" y="168" text-anchor="middle" fill="#8b949e" font-size="10" font-style="italic">registered at import time (main.py imports tools/)</text>
+
+  <rect x="48" y="174" width="140" height="120" rx="6" fill="#1a2535" stroke="#374151" stroke-width="1"/>
+  <text x="118" y="190" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="600">Web / HTTP</text>
+  <text x="118" y="204" text-anchor="middle" fill="#8b949e" font-size="10">web_search</text>
+  <text x="118" y="216" text-anchor="middle" fill="#8b949e" font-size="10">fetch_url</text>
+  <text x="118" y="228" text-anchor="middle" fill="#8b949e" font-size="10">http_get</text>
+  <text x="118" y="240" text-anchor="middle" fill="#8b949e" font-size="10">http_post</text>
+  <text x="118" y="264" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="600">Code</text>
+  <text x="118" y="278" text-anchor="middle" fill="#8b949e" font-size="10">run_python  •  pip_install</text>
+
+  <rect x="202" y="174" width="140" height="120" rx="6" fill="#1a2535" stroke="#374151" stroke-width="1"/>
+  <text x="272" y="190" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="600">File System</text>
+  <text x="272" y="204" text-anchor="middle" fill="#8b949e" font-size="10">read_file  •  write_file</text>
+  <text x="272" y="216" text-anchor="middle" fill="#8b949e" font-size="10">append_file</text>
+  <text x="272" y="228" text-anchor="middle" fill="#8b949e" font-size="10">list_directory</text>
+  <text x="272" y="240" text-anchor="middle" fill="#8b949e" font-size="10">delete_file</text>
+  <text x="272" y="264" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="600">Utility</text>
+  <text x="272" y="278" text-anchor="middle" fill="#8b949e" font-size="10">calculator  •  get_datetime</text>
+
+  <rect x="48" y="306" width="294" height="40" rx="6" fill="#1f2937" stroke="#f97316" stroke-width="1"/>
+  <text x="195" y="323" text-anchor="middle" fill="#fb923c" font-size="11" font-weight="600">execute_tool(name, args)</text>
+  <text x="195" y="338" text-anchor="middle" fill="#8b949e" font-size="10">lookup → td.fn(**args)  •  async-aware wrapper</text>
+
+  <rect x="48" y="356" width="294" height="32" rx="5" fill="#162419" stroke="#4ade80" stroke-width="1"/>
+  <text x="195" y="372" text-anchor="middle" fill="#4ade80" font-size="10">add tools: @tool(description=...) in tools/*.py</text>
+  <text x="195" y="384" text-anchor="middle" fill="#8b949e" font-size="10">then import in tools/__init__.py — auto-registered</text>
+
+  <!-- SSE Event Stream -->
+  <rect x="390" y="50" width="360" height="350" rx="10" fill="#111827" stroke="#374151" stroke-width="1.5"/>
+  <text x="570" y="72" text-anchor="middle" fill="#4ade80" font-size="13" font-weight="700">SSE Event Stream</text>
+  <text x="570" y="88" text-anchor="middle" fill="#8b949e" font-size="10">data: {JSON}\n\n  over /agents/run/stream</text>
+
+  <text x="410" y="108" fill="#8b949e" font-size="10" font-style="italic">AgentEventType</text>
+
+  <rect x="408" y="115" width="324" height="24" rx="4" fill="#1f2937"/>
+  <text x="420" y="131" fill="#6366f1" font-size="11" font-weight="600">step_start</text>
+  <text x="620" y="131" fill="#8b949e" font-size="10">{ step: N }</text>
+
+  <rect x="408" y="142" width="324" height="24" rx="4" fill="#1f2937"/>
+  <text x="420" y="158" fill="#a5b4fc" font-size="11" font-weight="600">text_delta</text>
+  <text x="620" y="158" fill="#8b949e" font-size="10">{ text: "..." }  (streaming)</text>
+
+  <rect x="408" y="169" width="324" height="24" rx="4" fill="#1f2937"/>
+  <text x="420" y="185" fill="#fb923c" font-size="11" font-weight="600">tool_call</text>
+  <text x="620" y="185" fill="#8b949e" font-size="10">{ tool_name, tool_input, id }</text>
+
+  <rect x="408" y="196" width="324" height="24" rx="4" fill="#1f2937"/>
+  <text x="420" y="212" fill="#fbbf24" font-size="11" font-weight="600">tool_result</text>
+  <text x="620" y="212" fill="#8b949e" font-size="10">{ tool_name, tool_result }</text>
+
+  <rect x="408" y="223" width="324" height="24" rx="4" fill="#1f2937"/>
+  <text x="420" y="239" fill="#6366f1" font-size="11" font-weight="600">step_end</text>
+  <text x="620" y="239" fill="#8b949e" font-size="10">{ step: N }</text>
+
+  <rect x="408" y="250" width="324" height="24" rx="4" fill="#162419" stroke="#4ade80" stroke-width="1"/>
+  <text x="420" y="266" fill="#4ade80" font-size="11" font-weight="600">done</text>
+  <text x="620" y="266" fill="#8b949e" font-size="10">{ final_text, usage, steps }</text>
+
+  <rect x="408" y="277" width="324" height="24" rx="4" fill="#1a1010" stroke="#e05252" stroke-width="1"/>
+  <text x="420" y="293" fill="#f87171" font-size="11" font-weight="600">error</text>
+  <text x="620" y="293" fill="#8b949e" font-size="10">{ error: "..." }</text>
+
+  <rect x="408" y="318" width="324" height="70" rx="6" fill="#1a2535" stroke="#3b82f6" stroke-width="1"/>
+  <text x="570" y="334" text-anchor="middle" fill="#60a5fa" font-size="11" font-weight="600">Frontend (Chat.tsx)</text>
+  <text x="570" y="350" text-anchor="middle" fill="#8b949e" font-size="10">consumeSSE() reads reader.read() in a loop</text>
+  <text x="570" y="364" text-anchor="middle" fill="#8b949e" font-size="10">text_delta → appends to bubble content</text>
+  <text x="570" y="378" text-anchor="middle" fill="#8b949e" font-size="10">tool_call/result → AgentTrace collapsible viewer</text>
+
+  <line x1="360" y1="323" x2="390" y2="323" stroke="#888" stroke-width="1.5" marker-end="url(#a)"/>
+</svg>

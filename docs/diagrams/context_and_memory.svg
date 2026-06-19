@@ -1,0 +1,71 @@
+<svg viewBox="0 0 780 440" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, -apple-system, sans-serif">
+  <title>Context Manager and Memory Layers</title>
+
+  <defs>
+    <marker id="a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#888"/>
+    </marker>
+  </defs>
+
+  <rect width="780" height="440" fill="#0d1117" rx="12"/>
+  <text x="390" y="30" text-anchor="middle" fill="#e6edf3" font-size="15" font-weight="700">Context Manager + Memory Layers</text>
+  <text x="390" y="48" text-anchor="middle" fill="#8b949e" font-size="11">orchestration/context_manager.py  •  memory/</text>
+
+  <!-- CONTEXT MANAGER -->
+  <rect x="30" y="66" width="360" height="340" rx="10" fill="#111827" stroke="#374151" stroke-width="1.5"/>
+  <text x="210" y="88" text-anchor="middle" fill="#60a5fa" font-size="13" font-weight="700">ContextManager</text>
+  <text x="210" y="103" text-anchor="middle" fill="#8b949e" font-size="10">context_manager.py</text>
+
+  <rect x="50" y="114" width="320" height="130" rx="7" fill="#1f2937" stroke="#2d4a7a" stroke-width="1"/>
+  <text x="210" y="132" text-anchor="middle" fill="#93c5fd" font-size="11" font-weight="600">Message List (sliding window)</text>
+  <rect x="60" y="140" width="300" height="22" rx="4" fill="#162035"/>
+  <text x="210" y="155" text-anchor="middle" fill="#4ade80" font-size="10">[0] user: "original goal"  ← always kept</text>
+  <rect x="60" y="165" width="300" height="18" rx="4" fill="#1a2535"/>
+  <text x="210" y="177" text-anchor="middle" fill="#8b949e" font-size="10">[1] assistant: reasoning + tool_use blocks</text>
+  <rect x="60" y="186" width="300" height="18" rx="4" fill="#1a2535"/>
+  <text x="210" y="198" text-anchor="middle" fill="#8b949e" font-size="10">[2] user: tool_result blocks</text>
+  <rect x="60" y="207" width="300" height="18" rx="4" fill="#1a2535"/>
+  <text x="210" y="219" text-anchor="middle" fill="#8b949e" font-size="10">[3] assistant: next reasoning …</text>
+  <text x="210" y="237" text-anchor="middle" fill="#8b949e" font-size="10">…</text>
+
+  <rect x="50" y="256" width="320" height="60" rx="7" fill="#1a2535" stroke="#f59e0b" stroke-width="1"/>
+  <text x="210" y="273" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="600">Token Budget Guard</text>
+  <text x="210" y="289" text-anchor="middle" fill="#8b949e" font-size="10">budget = settings.context_window_budget</text>
+  <text x="210" y="303" text-anchor="middle" fill="#8b949e" font-size="10">at 85% → drop msgs [1..N-4]  •  insert notice</text>
+
+  <rect x="50" y="328" width="320" height="30" rx="5" fill="#1f1a10" stroke="#f59e0b" stroke-width="1"/>
+  <text x="210" y="348" text-anchor="middle" fill="#fbbf24" font-size="10">"[N earlier messages removed...]" injected at [1]</text>
+
+  <rect x="50" y="366" width="320" height="28" rx="5" fill="#1f2937" stroke="#374151" stroke-width="1"/>
+  <text x="210" y="384" text-anchor="middle" fill="#8b949e" font-size="10">_estimate_tokens: 1 token ≈ 4 chars  (fast heuristic)</text>
+
+  <!-- MEMORY LAYERS -->
+  <rect x="420" y="66" width="330" height="340" rx="10" fill="#111827" stroke="#374151" stroke-width="1.5"/>
+  <text x="585" y="88" text-anchor="middle" fill="#a78bfa" font-size="13" font-weight="700">Memory Layers</text>
+
+  <rect x="438" y="100" width="294" height="96" rx="7" fill="#1a2035" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="585" y="118" text-anchor="middle" fill="#c4b5fd" font-size="12" font-weight="600">Episodic Memory</text>
+  <text x="585" y="133" text-anchor="middle" fill="#8b949e" font-size="10">memory/episodic.py  •  ChromaDB collection</text>
+  <text x="585" y="148" text-anchor="middle" fill="#8b949e" font-size="10">save_episode() after every run</text>
+  <text x="585" y="163" text-anchor="middle" fill="#8b949e" font-size="10">format_episode_context() → injected into sys prompt</text>
+  <text x="585" y="178" text-anchor="middle" fill="#8b949e" font-size="10">"Last time I tried X it took 5 steps and succeeded"</text>
+
+  <rect x="438" y="208" width="294" height="80" rx="7" fill="#1a2035" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="585" y="226" text-anchor="middle" fill="#a5b4fc" font-size="12" font-weight="600">Vector Store</text>
+  <text x="585" y="241" text-anchor="middle" fill="#8b949e" font-size="10">memory/vector_store.py  •  ChromaDB embedded</text>
+  <text x="585" y="256" text-anchor="middle" fill="#8b949e" font-size="10">POST /memory/add  •  POST /memory/search</text>
+  <text x="585" y="271" text-anchor="middle" fill="#8b949e" font-size="10">semantic search at agent startup (RAG)</text>
+
+  <rect x="438" y="300" width="294" height="70" rx="7" fill="#1a2035" stroke="#22d3ee" stroke-width="1.5"/>
+  <text x="585" y="318" text-anchor="middle" fill="#67e8f9" font-size="12" font-weight="600">SQLite (structured)</text>
+  <text x="585" y="333" text-anchor="middle" fill="#8b949e" font-size="10">db/models.py  •  Conversation, Turn, AgentRun</text>
+  <text x="585" y="348" text-anchor="middle" fill="#8b949e" font-size="10">full message history → loaded on conversation select</text>
+  <text x="585" y="363" text-anchor="middle" fill="#8b949e" font-size="10">GET /conversations/{id}</text>
+
+  <line x1="390" y1="148" x2="420" y2="148" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="405" y="143" text-anchor="middle" fill="#a78bfa" font-size="9">recall</text>
+  <line x1="390" y1="200" x2="420" y2="200" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="405" y="195" text-anchor="middle" fill="#a78bfa" font-size="9">save</text>
+
+  <text x="390" y="420" text-anchor="middle" fill="#8b949e" font-size="10" font-style="italic">ContextManager is in-memory (per run). Memory layers are persistent (ChromaDB / SQLite).</text>
+</svg>

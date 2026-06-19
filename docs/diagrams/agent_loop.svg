@@ -1,0 +1,93 @@
+<svg viewBox="0 0 780 620" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, -apple-system, sans-serif">
+  <title>Single Agent Loop: Plan → Act → Observe → Reflect</title>
+
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#888"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#e05252"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#52b788"/>
+    </marker>
+  </defs>
+
+  <rect width="780" height="620" fill="#0d1117" rx="12"/>
+
+  <text x="390" y="36" text-anchor="middle" fill="#e6edf3" font-size="15" font-weight="700">Single Agent Loop</text>
+  <text x="390" y="54" text-anchor="middle" fill="#8b949e" font-size="11">backend/orchestration/agent.py</text>
+
+  <!-- ENTRY -->
+  <rect x="295" y="74" width="190" height="40" rx="8" fill="#1f2937" stroke="#374151" stroke-width="1.5"/>
+  <text x="390" y="90" text-anchor="middle" fill="#93c5fd" font-size="12" font-weight="600">User Goal (POST /agents/run)</text>
+  <text x="390" y="105" text-anchor="middle" fill="#8b949e" font-size="10">api/agents.py → run_agent()</text>
+
+  <line x1="390" y1="114" x2="390" y2="138" stroke="#888" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- SETUP -->
+  <rect x="230" y="138" width="320" height="66" rx="8" fill="#1a2535" stroke="#2d4a7a" stroke-width="1.5"/>
+  <text x="390" y="156" text-anchor="middle" fill="#60a5fa" font-size="12" font-weight="600">Startup</text>
+  <text x="390" y="171" text-anchor="middle" fill="#8b949e" font-size="10">get_adapter(model)  •  get_tool_schemas()</text>
+  <text x="390" y="184" text-anchor="middle" fill="#8b949e" font-size="10">ContextManager()  •  episodic memory inject</text>
+
+  <line x1="390" y1="204" x2="390" y2="228" stroke="#888" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="390" y="244" text-anchor="middle" fill="#8b949e" font-size="10" font-style="italic">while step &lt; max_steps</text>
+
+  <!-- LOOP BOX -->
+  <rect x="80" y="256" width="620" height="248" rx="10" fill="#111827" stroke="#374151" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="104" y="274" fill="#8b949e" font-size="10" font-style="italic">one iteration</text>
+
+  <!-- 1 LLM CALL -->
+  <rect x="270" y="282" width="240" height="44" rx="8" fill="#1f2937" stroke="#6366f1" stroke-width="2"/>
+  <text x="390" y="300" text-anchor="middle" fill="#a5b4fc" font-size="12" font-weight="700">① LLM Call</text>
+  <text x="390" y="316" text-anchor="middle" fill="#8b949e" font-size="10">adapter.stream(messages, tools, system)</text>
+
+  <line x1="390" y1="326" x2="390" y2="350" stroke="#888" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Decision diamond -->
+  <polygon points="390,350 460,375 390,400 320,375" fill="#1a2535" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="390" y="372" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="600">tool calls?</text>
+
+  <!-- YES branch -->
+  <line x1="460" y1="375" x2="540" y2="375" stroke="#888" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="500" y="368" text-anchor="middle" fill="#8b949e" font-size="10">yes</text>
+  <rect x="540" y="354" width="130" height="42" rx="7" fill="#1f2937" stroke="#f97316" stroke-width="1.5"/>
+  <text x="605" y="372" text-anchor="middle" fill="#fb923c" font-size="11" font-weight="600">② Execute Tools</text>
+  <text x="605" y="385" text-anchor="middle" fill="#8b949e" font-size="10">execute_tool(name, args)</text>
+
+  <line x1="605" y1="396" x2="605" y2="470" stroke="#888" stroke-width="1.5"/>
+  <line x1="605" y1="470" x2="390" y2="470" stroke="#888" stroke-width="1.5"/>
+  <text x="500" y="465" text-anchor="middle" fill="#8b949e" font-size="10">ctx.add(tool_result)</text>
+  <line x1="390" y1="470" x2="390" y2="490" stroke="#888" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="362" y="484" text-anchor="end" fill="#8b949e" font-size="10">next step</text>
+
+  <!-- NO branch -->
+  <line x1="390" y1="400" x2="390" y2="424" stroke="#52b788" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+  <text x="370" y="418" text-anchor="middle" fill="#52b788" font-size="10">no</text>
+  <rect x="270" y="424" width="240" height="40" rx="7" fill="#162419" stroke="#52b788" stroke-width="1.5"/>
+  <text x="390" y="443" text-anchor="middle" fill="#52b788" font-size="12" font-weight="600">③ Final Answer</text>
+  <text x="390" y="457" text-anchor="middle" fill="#8b949e" font-size="10">yield AgentEvent DONE</text>
+
+  <line x1="390" y1="490" x2="200" y2="490" stroke="#888" stroke-width="1.5"/>
+  <line x1="200" y1="490" x2="200" y2="270" stroke="#888" stroke-width="1.5"/>
+  <line x1="200" y1="270" x2="270" y2="270" stroke="#888" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="155" y="382" text-anchor="middle" fill="#8b949e" font-size="10" transform="rotate(-90,155,382)">loop back</text>
+
+  <line x1="390" y1="464" x2="390" y2="516" stroke="#52b788" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <!-- POST-LOOP -->
+  <rect x="270" y="516" width="240" height="44" rx="8" fill="#1a2535" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="390" y="534" text-anchor="middle" fill="#a78bfa" font-size="12" font-weight="600">④ Save Episode</text>
+  <text x="390" y="549" text-anchor="middle" fill="#8b949e" font-size="10">memory/episodic.py → save_episode()</text>
+
+  <line x1="390" y1="560" x2="390" y2="584" stroke="#888" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="270" y="584" width="240" height="28" rx="8" fill="#1f2937" stroke="#374151" stroke-width="1"/>
+  <text x="390" y="603" text-anchor="middle" fill="#8b949e" font-size="11">SSE stream → frontend</text>
+
+  <!-- MAX STEPS exit -->
+  <line x1="700" y1="375" x2="740" y2="375" stroke="#e05252" stroke-width="1.5"/>
+  <line x1="740" y1="375" x2="740" y2="540" stroke="#e05252" stroke-width="1.5"/>
+  <line x1="740" y1="540" x2="520" y2="540" stroke="#e05252" stroke-width="1.5" marker-end="url(#arrow-red)"/>
+  <text x="755" y="460" text-anchor="start" fill="#e05252" font-size="10" transform="rotate(90,755,460)">max_steps hit → DONE partial</text>
+</svg>

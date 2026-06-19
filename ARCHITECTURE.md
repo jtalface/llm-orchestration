@@ -173,6 +173,8 @@ Normalized schema (internal):              Anthropic format:
 
 The single-agent loop is the core product. It runs in `backend/orchestration/agent.py`.
 
+![Agent Loop](docs/diagrams/agent_loop.svg)
+
 ```
                      ┌──────────────────────┐
                      │   RECEIVE GOAL       │
@@ -262,6 +264,8 @@ The loop yields typed events that are forwarded to the frontend via SSE:
 
 ## 5. Tool Registry
 
+![Tool Registry and SSE Event Stream](docs/diagrams/tool_registry_and_sse.svg)
+
 Tools are registered via a `@tool` decorator that:
 1. Auto-generates a JSON Schema from the Python function signature
 2. Registers the tool by name in a global dict
@@ -325,6 +329,8 @@ This produces:
 
 ## 6. Memory Architecture
 
+![Context Manager and Memory Layers](docs/diagrams/context_and_memory.svg)
+
 Four memory types, matching the taxonomy from AI systems research:
 
 ```
@@ -384,6 +390,8 @@ Save episode summary: goal + outcome + steps_taken → ChromaDB
 ---
 
 ## 7. Multi-Agent Orchestration
+
+![Multi-Agent Orchestration](docs/diagrams/multi_agent.svg)
 
 For goals too large or complex for a single context window, a manager agent decomposes the work:
 

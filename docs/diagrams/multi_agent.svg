@@ -1,0 +1,75 @@
+<svg viewBox="0 0 780 500" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, -apple-system, sans-serif">
+  <title>Multi-Agent Topology: Manager + Specialists + Synthesis</title>
+
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#888"/>
+    </marker>
+    <marker id="arr-blue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#60a5fa"/>
+    </marker>
+    <marker id="arr-purple" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#a78bfa"/>
+    </marker>
+  </defs>
+
+  <rect width="780" height="500" fill="#0d1117" rx="12"/>
+
+  <text x="390" y="32" text-anchor="middle" fill="#e6edf3" font-size="15" font-weight="700">Multi-Agent Orchestration</text>
+  <text x="390" y="50" text-anchor="middle" fill="#8b949e" font-size="11">backend/orchestration/multi_agent.py</text>
+
+  <!-- Goal in -->
+  <rect x="295" y="66" width="190" height="36" rx="7" fill="#1f2937" stroke="#374151" stroke-width="1.5"/>
+  <text x="390" y="81" text-anchor="middle" fill="#93c5fd" font-size="12" font-weight="600">User Goal</text>
+  <text x="390" y="95" text-anchor="middle" fill="#8b949e" font-size="10">multi_agent: true flag</text>
+
+  <line x1="390" y1="102" x2="390" y2="126" stroke="#888" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Manager / Decompose -->
+  <rect x="230" y="126" width="320" height="52" rx="8" fill="#1a2535" stroke="#3b82f6" stroke-width="2"/>
+  <text x="390" y="146" text-anchor="middle" fill="#60a5fa" font-size="13" font-weight="700">① Manager: Decompose</text>
+  <text x="390" y="162" text-anchor="middle" fill="#8b949e" font-size="10">adapter.complete()  •  DECOMPOSE_SYSTEM prompt</text>
+  <text x="390" y="174" text-anchor="middle" fill="#8b949e" font-size="10">→ JSON list of 2–5 SubtaskSpec objects</text>
+
+  <!-- fan out arrows -->
+  <line x1="340" y1="178" x2="160" y2="246" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arr-blue)"/>
+  <line x1="390" y1="178" x2="390" y2="246" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arr-blue)"/>
+  <line x1="440" y1="178" x2="620" y2="246" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arr-blue)"/>
+
+  <text x="390" y="220" text-anchor="middle" fill="#8b949e" font-size="10" font-style="italic">asyncio.Semaphore(max_parallel=3)  — run concurrently</text>
+
+  <!-- Specialist agents -->
+  <rect x="60" y="246" width="200" height="66" rx="8" fill="#1f2937" stroke="#f97316" stroke-width="1.5"/>
+  <text x="160" y="265" text-anchor="middle" fill="#fb923c" font-size="12" font-weight="600">Specialist A</text>
+  <text x="160" y="280" text-anchor="middle" fill="#8b949e" font-size="10">run_agent(subtask.goal)</text>
+  <text x="160" y="293" text-anchor="middle" fill="#8b949e" font-size="10">tool_names: [web_search]</text>
+  <text x="160" y="306" text-anchor="middle" fill="#8b949e" font-size="10">Plan→Act→Observe loop</text>
+
+  <rect x="290" y="246" width="200" height="66" rx="8" fill="#1f2937" stroke="#f97316" stroke-width="1.5"/>
+  <text x="390" y="265" text-anchor="middle" fill="#fb923c" font-size="12" font-weight="600">Specialist B</text>
+  <text x="390" y="280" text-anchor="middle" fill="#8b949e" font-size="10">run_agent(subtask.goal)</text>
+  <text x="390" y="293" text-anchor="middle" fill="#8b949e" font-size="10">tool_names: [run_python]</text>
+  <text x="390" y="306" text-anchor="middle" fill="#8b949e" font-size="10">Plan→Act→Observe loop</text>
+
+  <rect x="520" y="246" width="200" height="66" rx="8" fill="#1f2937" stroke="#f97316" stroke-width="1.5"/>
+  <text x="620" y="265" text-anchor="middle" fill="#fb923c" font-size="12" font-weight="600">Specialist C</text>
+  <text x="620" y="280" text-anchor="middle" fill="#8b949e" font-size="10">run_agent(subtask.goal)</text>
+  <text x="620" y="293" text-anchor="middle" fill="#8b949e" font-size="10">tool_names: [write_file]</text>
+  <text x="620" y="306" text-anchor="middle" fill="#8b949e" font-size="10">Plan→Act→Observe loop</text>
+
+  <!-- collect arrows -->
+  <line x1="160" y1="312" x2="340" y2="380" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#arr-purple)"/>
+  <line x1="390" y1="312" x2="390" y2="380" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#arr-purple)"/>
+  <line x1="620" y1="312" x2="440" y2="380" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#arr-purple)"/>
+
+  <!-- Synthesis -->
+  <rect x="230" y="380" width="320" height="52" rx="8" fill="#1a2035" stroke="#8b5cf6" stroke-width="2"/>
+  <text x="390" y="400" text-anchor="middle" fill="#a78bfa" font-size="13" font-weight="700">② Synthesizer</text>
+  <text x="390" y="416" text-anchor="middle" fill="#8b949e" font-size="10">adapter.complete()  •  SYNTHESIZE_SYSTEM prompt</text>
+  <text x="390" y="428" text-anchor="middle" fill="#8b949e" font-size="10">integrates all subtask results into one response</text>
+
+  <line x1="390" y1="432" x2="390" y2="458" stroke="#888" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <rect x="270" y="458" width="240" height="30" rx="7" fill="#1f2937" stroke="#374151" stroke-width="1"/>
+  <text x="390" y="479" text-anchor="middle" fill="#8b949e" font-size="11">MultiAgentEvent DONE → SSE stream</text>
+</svg>
