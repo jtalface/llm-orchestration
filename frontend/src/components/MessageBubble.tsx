@@ -1,6 +1,7 @@
 import React from 'react'
 import { Message } from '../types'
 import AgentTrace from './AgentTrace'
+import MultiAgentPanel from './MultiAgentPanel'
 
 interface Props {
   message: Message
@@ -49,8 +50,20 @@ export default function MessageBubble({ message }: Props) {
         )}
       </div>
 
-      {/* Agent trace — shown below the bubble */}
-      {message.isAgent && message.agentEvents && message.agentEvents.length > 0 && (
+      {/* Multi-agent panel */}
+      {message.isMultiAgent && message.multiAgentPlan && (
+        <div style={{ maxWidth: '90%', width: '100%' }}>
+          <MultiAgentPanel
+            plan={message.multiAgentPlan}
+            subtasks={message.subtasks ?? {}}
+            synthesisStatus={message.synthesisStatus ?? 'idle'}
+            isStreaming={!!message.isStreaming}
+          />
+        </div>
+      )}
+
+      {/* Single-agent trace — shown below the bubble */}
+      {message.isAgent && !message.isMultiAgent && message.agentEvents && message.agentEvents.length > 0 && (
         <div style={{ maxWidth: '80%', width: '100%' }}>
           <AgentTrace events={message.agentEvents} />
         </div>

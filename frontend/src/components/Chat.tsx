@@ -64,7 +64,9 @@ export default function Chat({ conversation, onFirstMessage }: Props) {
       content: '',
       isStreaming: true,
       isAgent: isAgentMode,
+      isMultiAgent: isAgentMode && isMultiAgent,
       agentEvents: [],
+      synthesisStatus: 'idle',
     }
 
     setMessages(prev => [...prev, userMsg, assistantMsg])
@@ -142,34 +144,79 @@ export default function Chat({ conversation, onFirstMessage }: Props) {
     await consumeSSE(res, (data) => {
       if (data === '[DONE]') return
       try {
-        const ev: AgentEvent = JSON.parse(data)
+        const ev = JSON.parse(data)
 
+        if (!isMultiAgent) {
+          // Single-agent: existing behaviour
+          const agentEv = ev as AgentEvent
+          setMessages(prev => prev.map(m => {
+            if (m.id !== assistantId) return m
+            const newEvents = [...(m.agentEvents || []), agentEv]
+            if (agentEv.type === 'text_delta' && agentEv.text)
+              return { ...m, content: m.content + agentEv.text, agentEvents: newEvents }
+            if (agentEv.type === 'done')
+              return { ...m, content: agentEv.final_text || m.content, isStreaming: false, agentEvents: newEvents, usage: agentEv.usage }
+            if (agentEv.type === 'error')
+              return { ...m, content: `Error: ${agentEv.error}`, isStreaming: false, agentEvents: newEvents }
+            return { ...m, agentEvents: newEvents }
+          }))
+          return
+        }
+
+        // Multi-agent: parse subtask structure
         setMessages(prev => prev.map(m => {
           if (m.id !== assistantId) return m
 
-          const newEvents = [...(m.agentEvents || []), ev]
+          if (ev.type === 'plan') {
+            const plan = ev.plan as Array<{ id: string; title: string; goal: string }>
+            const subtasks: Record<string, import('../types').SubtaskState> = {}
+            for (const p of plan) {
+              subtasks[p.id] = { id: p.id, title: p.title, goal: p.goal, status: 'pending', step: 0, events: [] }
+            }
+            return { ...m, multiAgentPlan: plan, subtasks }
+          }
 
-          if (ev.type === 'text_delta' && ev.text) {
-            return { ...m, content: m.content + ev.text, agentEvents: newEvents }
+          if (ev.type === 'subtask_start') {
+            const subtasks = { ...(m.subtasks || {}) }
+            if (ev.subtask_id && subtasks[ev.subtask_id])
+              subtasks[ev.subtask_id] = { ...subtasks[ev.subtask_id], status: 'running' }
+            return { ...m, subtasks }
           }
+
+          if (ev.type === 'agent_event' && ev.subtask_id && ev.agent_event) {
+            const subtasks = { ...(m.subtasks || {}) }
+            const sub = subtasks[ev.subtask_id]
+            if (!sub) return m
+            const ae = ev.agent_event as AgentEvent
+            const newEvents = [...sub.events, ae]
+            const updates: Partial<import('../types').SubtaskState> = { events: newEvents }
+            if (ae.type === 'step_start') updates.step = ae.step ?? sub.step
+            if (ae.type === 'tool_call') updates.currentTool = ae.tool_name
+            if (ae.type === 'tool_result') updates.currentTool = undefined
+            subtasks[ev.subtask_id] = { ...sub, ...updates }
+            return { ...m, subtasks }
+          }
+
+          if (ev.type === 'subtask_done') {
+            const subtasks = { ...(m.subtasks || {}) }
+            if (ev.subtask_id && subtasks[ev.subtask_id])
+              subtasks[ev.subtask_id] = { ...subtasks[ev.subtask_id], status: 'done', finalText: ev.final_text, currentTool: undefined }
+            return { ...m, subtasks }
+          }
+
+          if (ev.type === 'synthesis') {
+            return { ...m, synthesisStatus: 'running' as const }
+          }
+
           if (ev.type === 'done') {
-            return {
-              ...m,
-              content: ev.final_text || m.content,
-              isStreaming: false,
-              agentEvents: newEvents,
-              usage: ev.usage,
-            }
+            return { ...m, content: ev.final_text || m.content, isStreaming: false, synthesisStatus: 'done' as const }
           }
+
           if (ev.type === 'error') {
-            return {
-              ...m,
-              content: `Error: ${ev.error}`,
-              isStreaming: false,
-              agentEvents: newEvents,
-            }
+            return { ...m, content: `Error: ${ev.error}`, isStreaming: false }
           }
-          return { ...m, agentEvents: newEvents }
+
+          return m
         }))
       } catch {}
     })

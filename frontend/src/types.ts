@@ -33,6 +33,19 @@ export interface AgentEvent {
   usage?: { input_tokens: number; output_tokens: number; steps: number }
 }
 
+export type SubtaskStatus = 'pending' | 'running' | 'done' | 'error'
+
+export interface SubtaskState {
+  id: string
+  title: string
+  goal: string
+  status: SubtaskStatus
+  step: number
+  currentTool?: string
+  events: AgentEvent[]
+  finalText?: string
+}
+
 export interface Message {
   id: string
   role: 'user' | 'assistant'
@@ -40,6 +53,10 @@ export interface Message {
   isStreaming?: boolean
   agentEvents?: AgentEvent[]
   isAgent?: boolean
+  isMultiAgent?: boolean
+  multiAgentPlan?: Array<{ id: string; title: string; goal: string }>
+  subtasks?: Record<string, SubtaskState>
+  synthesisStatus?: 'idle' | 'running' | 'done'
   usage?: { input_tokens: number; output_tokens: number; steps?: number }
 }
 
