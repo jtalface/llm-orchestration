@@ -72,67 +72,66 @@ class OpenAIAdapter(BaseLLMAdapter):
         # Buffers for assembling streamed tool calls
         tool_buffers: dict[int, dict] = {}
 
-        async with self.client.chat.completions.stream(**params) as s:
-            async for chunk in s:
-                choice = chunk.choices[0] if chunk.choices else None
-                if not choice:
-                    # usage chunk
-                    if chunk.usage:
-                        yield StreamEvent(
-                            type=StreamEventType.USAGE,
-                            usage={
-                                "input_tokens": chunk.usage.prompt_tokens,
-                                "output_tokens": chunk.usage.completion_tokens,
-                            },
-                        )
-                    continue
-
-                delta = choice.delta
-
-                if delta.content:
-                    yield StreamEvent(type=StreamEventType.TEXT_DELTA, text=delta.content)
-
-                if delta.tool_calls:
-                    for tc in delta.tool_calls:
-                        idx = tc.index
-                        if idx not in tool_buffers:
-                            tool_buffers[idx] = {
-                                "id": tc.id or str(uuid.uuid4()),
-                                "name": tc.function.name or "",
-                                "input_json": "",
-                            }
-                            yield StreamEvent(
-                                type=StreamEventType.TOOL_CALL_START,
-                                tool_call_id=tool_buffers[idx]["id"],
-                                tool_name=tool_buffers[idx]["name"],
-                            )
-                        if tc.function.name and not tool_buffers[idx]["name"]:
-                            tool_buffers[idx]["name"] = tc.function.name
-                        if tc.function.arguments:
-                            tool_buffers[idx]["input_json"] += tc.function.arguments
-                            yield StreamEvent(
-                                type=StreamEventType.TOOL_CALL_DELTA,
-                                tool_call_id=tool_buffers[idx]["id"],
-                                tool_input_delta=tc.function.arguments,
-                            )
-
-                if choice.finish_reason:
-                    for buf in tool_buffers.values():
-                        try:
-                            parsed = json.loads(buf["input_json"]) if buf["input_json"] else {}
-                        except json.JSONDecodeError:
-                            parsed = {}
-                        yield StreamEvent(
-                            type=StreamEventType.TOOL_CALL_END,
-                            tool_call_id=buf["id"],
-                            tool_name=buf["name"],
-                            tool_input=parsed,
-                        )
-                    tool_buffers.clear()
+        s = await self.client.chat.completions.create(**params)
+        async for chunk in s:
+            choice = chunk.choices[0] if chunk.choices else None
+            if not choice:
+                if chunk.usage:
                     yield StreamEvent(
-                        type=StreamEventType.STOP,
-                        stop_reason=choice.finish_reason,
+                        type=StreamEventType.USAGE,
+                        usage={
+                            "input_tokens": chunk.usage.prompt_tokens,
+                            "output_tokens": chunk.usage.completion_tokens,
+                        },
                     )
+                continue
+
+            delta = choice.delta
+
+            if delta.content:
+                yield StreamEvent(type=StreamEventType.TEXT_DELTA, text=delta.content)
+
+            if delta.tool_calls:
+                for tc in delta.tool_calls:
+                    idx = tc.index
+                    if idx not in tool_buffers:
+                        tool_buffers[idx] = {
+                            "id": tc.id or str(uuid.uuid4()),
+                            "name": tc.function.name or "",
+                            "input_json": "",
+                        }
+                        yield StreamEvent(
+                            type=StreamEventType.TOOL_CALL_START,
+                            tool_call_id=tool_buffers[idx]["id"],
+                            tool_name=tool_buffers[idx]["name"],
+                        )
+                    if tc.function.name and not tool_buffers[idx]["name"]:
+                        tool_buffers[idx]["name"] = tc.function.name
+                    if tc.function.arguments:
+                        tool_buffers[idx]["input_json"] += tc.function.arguments
+                        yield StreamEvent(
+                            type=StreamEventType.TOOL_CALL_DELTA,
+                            tool_call_id=tool_buffers[idx]["id"],
+                            tool_input_delta=tc.function.arguments,
+                        )
+
+            if choice.finish_reason:
+                for buf in tool_buffers.values():
+                    try:
+                        parsed = json.loads(buf["input_json"]) if buf["input_json"] else {}
+                    except json.JSONDecodeError:
+                        parsed = {}
+                    yield StreamEvent(
+                        type=StreamEventType.TOOL_CALL_END,
+                        tool_call_id=buf["id"],
+                        tool_name=buf["name"],
+                        tool_input=parsed,
+                    )
+                tool_buffers.clear()
+                yield StreamEvent(
+                    type=StreamEventType.STOP,
+                    stop_reason=choice.finish_reason,
+                )
 
     async def complete(
         self,
