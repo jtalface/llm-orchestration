@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { MODELS } from '../types'
 
 interface Props {
@@ -12,10 +12,14 @@ interface Props {
 
 export default function ModelSelector({ value, onChange, isAgent, onToggleAgent, isMultiAgent, onToggleMultiAgent }: Props) {
   const [open, setOpen] = useState(false)
+  const [models, setModels] = useState<Record<string, string[]>>(MODELS)
 
-  const allModels = Object.entries(MODELS).flatMap(([provider, models]) =>
-    models.map(m => ({ provider, model: m }))
-  )
+  useEffect(() => {
+    fetch('/agents/models')
+      .then(r => r.json())
+      .then(data => setModels(data))
+      .catch(() => {})
+  }, [])
 
   const displayName = value.length > 28 ? '...' + value.slice(-25) : value
 
@@ -30,12 +34,12 @@ export default function ModelSelector({ value, onChange, isAgent, onToggleAgent,
 
       {open && (
         <div style={dropdownStyle} onClick={e => e.stopPropagation()}>
-          {Object.entries(MODELS).map(([provider, models]) => (
+          {Object.entries(models).map(([provider, providerModels]) => (
             <div key={provider}>
               <div style={{ padding: '6px 10px 3px', fontSize: 10, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                 {provider}
               </div>
-              {models.map(m => (
+              {providerModels.map(m => (
                 <div
                   key={m}
                   onClick={() => { onChange(m); setOpen(false) }}

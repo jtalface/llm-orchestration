@@ -8,6 +8,7 @@ import json
 import uuid
 from datetime import datetime, timezone
 from typing import Optional
+import httpx
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
@@ -161,7 +162,18 @@ def list_tools():
 
 @router.get("/models")
 def list_models():
-    """Return known model IDs grouped by provider."""
+    """Return known model IDs grouped by provider, with live Ollama discovery."""
+    ollama_models: list[str] = []
+    try:
+        resp = httpx.get("http://localhost:11434/api/tags", timeout=2.0)
+        if resp.status_code == 200:
+            ollama_models = [m["name"] for m in resp.json().get("models", [])]
+    except Exception:
+        pass
+    # Fall back to common defaults if Ollama isn't running
+    if not ollama_models:
+        ollama_models = ["llama3.2", "mistral", "qwen2.5", "phi4", "deepseek-r1"]
+
     return {
         "anthropic": [
             "claude-opus-4-8",
@@ -170,7 +182,7 @@ def list_models():
         ],
         "openai": ["gpt-4o", "gpt-4o-mini", "o1", "o3"],
         "gemini": ["gemini-2.5-pro", "gemini-2.5-flash"],
-        "ollama": ["llama3.2", "mistral", "qwen2.5", "phi4", "deepseek-r1"],
+        "ollama": ollama_models,
         "openrouter": [
             "anthropic/claude-opus-4-8",
             "meta-llama/llama-3.3-70b-instruct",
